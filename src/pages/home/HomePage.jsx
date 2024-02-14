@@ -16,20 +16,22 @@ import PlayIcon from "../../../public/assets/playicon.png"
 
 function HomePage() 
 {
-  const ws = useRef(null);
+  // const ws = useRef(null);
   const containerRef = useRef(null);
-  const [frames, setFrames] = useState([]);
+  // const [frames, setFrames] = useState([]);
   const [showChatbot, setShowChatbot] = useState(false);
   const [displayChat, setDisplayChat] = useState(false);
   const [slideOut, setSlideOut] = useState(false);
   const [file, setfile] = useRecoilState(Filename);
-  const [isDark, setIsDark] = useState(false);
+  // const [isDark, setIsDark] = useState(false);
   const [commentHistory, setcommentHistory] = useRecoilState(comment);
   const [flag, setflag] = useState(true);
   const [recommend, setRecommend] = useState([]);
   const navigate = useNavigate();
   const videoWrapperRef = useRef(null);
   const [videoWrapperWidth, setVideoWrapperWidth] = useState(0);
+  const [socket, setSocket] = useState();
+  const [value, setValue] = useState({});
 
 
   useEffect(() => {
@@ -128,11 +130,11 @@ function HomePage()
     const ws = new WebSocket("ws://192.168.1.124:8000/ws");
     return ws;
   }
-  const [socket, setSocket] = useState();
-  const [value, setValue] = useState({});
+
   useEffect(() => {
     setSocket(socket_init());
   }, []);
+
   if (socket)
     socket.onmessage = function (event) {
       console.log(event.data);
@@ -144,19 +146,23 @@ function HomePage()
       console.log(commentHistory, "comment");
       handleScrollToBottom();
     };
-  useEffect(() => {
-    console.log(value.image, "hi");
-  }, [value]);
-  function sendMessage(event) {
-    if (socket) socket?.send(document.getElementById("input").value);
-  }
+
+  // useEffect(() => {
+  //   console.log(value.image, "hi");
+  // }, [value]);
+
+  // function sendMessage(event) {
+  //   if (socket) socket?.send(document.getElementById("input").value);
+  // }
+
   const handleScrollToBottom = () => {
     const dashboardContainer = document.querySelector(".msger-chat");
     if (dashboardContainer) {
       dashboardContainer.scrollTop = dashboardContainer.scrollHeight;
     }
   };
-  const startLive = () => {};
+
+  // const startLive = () => {};
 
   useEffect(() => {
     const updateVideoWrapperWidth = () => {
@@ -174,7 +180,7 @@ function HomePage()
 
 
   return (
-    <div className={`wrapper  ${isDark ? "dark" : "light"}`}>
+    <div className="wrapper light">
       <div className="app-container">
         <div className="left-side" onClick={handleDisplayChat}>
           <nav className="nav">
@@ -221,13 +227,8 @@ function HomePage()
         </div>
         <div className="app-main" onClick={handleDisplayChat}>
           <div className="video-wrapper" ref={videoWrapperRef}>
-            {/* {
-              <img
-                src={`data:image/jpeg;base64,${value?.image}`}
-                alt="test"
-              ></img>
-            } */}
-            {flag ? (
+             <div style={{position:"relative" ,width:"100%"}}>
+             {flag ? (
               <div
                 style={{
                   textAlign: "center",
@@ -239,9 +240,9 @@ function HomePage()
               >
                 Welcome to our Visage
                 <p style={{ fontSize: "16px" }}>play your video</p>
-                {/* <div>
-                    <img src={PlayIcon} alt=""  style={{width:"30px",height:"30px"}}/>
-                </div> */}
+                <div style={{display:"flex",justifyContent:"center",marginTop:"60px"}}>
+                    <img src={PlayIcon} alt=""  style={{width:"60px",height:"60px"}}/>
+                </div> 
               </div>
             ) : (
               <img
@@ -249,43 +250,56 @@ function HomePage()
                 alt="test"
               ></img>
             )}
-               {/* <div className='play-button-wrap'>
-                    {value!=''?<img src='../../../public/assets/118620_play_icon.png'></img>:null}
-               </div> */}
             {flag ? (
-             <div className="recommendedVedios">
-             {videoWrapperWidth > 600 ? (
-               recommend.slice(0, 4).map((item, index) => (
-                 <div className={`recommend box${index + 1}`} key={item?.name}>
-                   <img
-                     src={`data:image/jpeg;base64,${item?.first_frame}`}
-                     alt="test"
-                     onClick={() => {
-                       VideoPlay.play(item?.name);
-                       setflag(false);
-                       setcommentHistory([]);
-                     }}
-                   ></img>
-                 </div>
-               ))
-             ) : (
-               recommend.slice(0,3).map((item, index) => (
-                 <div className={`recommend alignbox${index + 1}`} key={item?.name}>
-                   <img
-                     src={`data:image/jpeg;base64,${item?.first_frame}`}
-                     alt="test"
-                     onClick={() => {
-                       VideoPlay.play(item?.name);
-                       setflag(false);
-                       setcommentHistory([]);
-                     }}
-                   ></img>
-                 </div>
-               ))
-             )}
+           <div className="recommendedVedios">
+           {videoWrapperWidth > 600 ? (
+             recommend.slice(0, 4).map((item, index) => (
+               <div className={`recommend box${index + 1}`} key={item?.name}>
+                 <img
+                   src={`data:image/jpeg;base64,${item?.first_frame}`}
+                   alt="test"
+                   onClick={() => {
+                     VideoPlay.play(item?.name);
+                     setflag(false);
+                     setcommentHistory([]);
+                   }}
+                 ></img>
+               </div>
+             ))
+           ) : videoWrapperWidth < 450 ? (
+             recommend.slice(0, 2).map((item, index) => (
+               <div className={`recommend alignCenterbox${index + 1}`} key={item?.name}>
+                 <img
+                   src={`data:image/jpeg;base64,${item?.first_frame}`}
+                   alt="test"
+                   onClick={() => {
+                     VideoPlay.play(item?.name);
+                     setflag(false);
+                     setcommentHistory([]);
+                   }}
+                 ></img>
+               </div>
+             ))
+           ) : (
+             recommend.slice(0, 3).map((item, index) => (
+               <div className={`recommend alignbox${index + 1}`} key={item?.name}>
+                 <img
+                   src={`data:image/jpeg;base64,${item?.first_frame}`}
+                   alt="test"
+                   onClick={() => {
+                     VideoPlay.play(item?.name);
+                     setflag(false);
+                     setcommentHistory([]);
+                   }}
+                 ></img>
+               </div>
+             ))
+           )}
            </div>
+         
            
             ) : null}
+             </div>
           </div>
           <div className="comment-wrapper">
             <section className="msger">

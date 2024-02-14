@@ -28,6 +28,7 @@ class playvideo {
   async pause(){
     try {
       const response = await axios.delete(`${apiBase}/pause`);
+      console.log("PAUSE : ",response.data);
       return response.data;
     } catch (e) {
       console.log(e);
